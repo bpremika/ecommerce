@@ -1,0 +1,190 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                Int                 @id @default(autoincrement())
+  username          String              @unique
+  email             String              @unique
+  password          String
+  first_name        String
+  last_name         String
+  phone_number      Int
+  created_at        DateTime            @default(now())
+  modified_at       DateTime            @default(now())
+  address           Address[]
+  UserPaymentMethod UserPaymentMethod[]
+  ShoppingCart      ShoppingCart[]
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model AdminUser {
+  id          Int      @id @default(autoincrement())
+  username    String   @unique
+  password    String
+  first_name  String
+  last_name   String
+  last_login  DateTime
+  created_at  DateTime
+  modified_at DateTime
+}
+
+model Address {
+  id            Int         @id @default(autoincrement())
+  address_line1 String
+  address_line2 String
+  city          String
+  postal_code   String
+  country       String
+  phone_number  Int
+  user          User[]
+  ShopOrder     ShopOrder[]
+}
+
+model UserPaymentMethod {
+  id              Int      @id @default(autoincrement())
+  user            User     @relation(fields: [user_id], references: [id])
+  user_id         Int
+  payment_type_id Int
+  provider        String
+  account_number  Int
+  expiry_date     DateTime
+  is_default      Boolean
+}
+
+model PaymentType {
+  id    Int    @id @default(autoincrement())
+  value String
+}
+
+model Product {
+  id          Int             @id @default(autoincrement())
+  name        String
+  desc        String
+  category    ProductCategory @relation(fields: [category_id], references: [id])
+  category_id Int
+  product_img String
+  price       Int
+  created_at  DateTime
+  modified_at DateTime
+  deleted_at  DateTime
+  ProductItem ProductItem[]
+}
+
+model ProductCategory {
+  id                 Int               @id @default(autoincrement())
+  parent_category    ProductCategory   @relation("ParentCategory", fields: [parent_category_id], references: [id])
+  parent_category_id Int
+  name               String
+  created_at         DateTime
+  modified_at        DateTime
+  deleted_at         DateTime
+  Product            Product[]
+  ProductCategory    ProductCategory[] @relation("ParentCategory")
+  Variation          Variation[]
+}
+
+model ProductItem {
+  id               Int                @id @default(autoincrement())
+  product          Product            @relation(fields: [product_id], references: [id])
+  product_id       Int
+  quantity         Int
+  SKU              Int
+  price            Int
+  product_img      String
+  created_at       DateTime
+  modified_at      DateTime
+  deleted_at       DateTime
+  variation_option VariationOption[]
+  ShoppingCartItem ShoppingCartItem[]
+  OrderLine        OrderLine[]
+}
+
+model Variation {
+  id              Int               @id @default(autoincrement())
+  category        ProductCategory   @relation(fields: [category_id], references: [id])
+  category_id     Int
+  name            String
+  VariationOption VariationOption[]
+}
+
+model VariationOption {
+  id           Int           @id @default(autoincrement())
+  variation    Variation     @relation(fields: [variation_id], references: [id])
+  variation_id Int
+  value        String
+  product_item ProductItem[]
+}
+
+model ShoppingCart {
+  id               Int                @id @default(autoincrement())
+  user             User               @relation(fields: [user_id], references: [id])
+  user_id          Int
+  ShoppingCartItem ShoppingCartItem[]
+}
+
+model ShoppingCartItem {
+  id              Int          @id @default(autoincrement())
+  cart            ShoppingCart @relation(fields: [cart_id], references: [id])
+  cart_id         Int
+  product_item    ProductItem  @relation(fields: [product_item_id], references: [id])
+  product_item_id Int
+  quantity        Int
+}
+
+model ShopOrder {
+  id                  Int            @id @default(autoincrement())
+  user_id             Int
+  order_date          DateTime
+  payment_method_id   Int
+  shipping_address    Address        @relation(fields: [shipping_address_id], references: [id])
+  shipping_address_id Int
+  shipping_method     ShippingMethod @relation(fields: [shipping_method_id], references: [id])
+  shipping_method_id  Int
+  order_total         Int
+  order_status        OrderStatus    @relation(fields: [order_status_id], references: [id])
+  order_status_id     Int
+  OrderLine           OrderLine[]
+}
+
+model OrderLine {
+  id              Int         @id @default(autoincrement())
+  product_item    ProductItem @relation(fields: [product_item_id], references: [id])
+  product_item_id Int
+  order           ShopOrder   @relation(fields: [order_id], references: [id])
+  order_id        Int
+  quantity        Int
+  price           Int
+}
+
+model OrderStatus {
+  id        Int         @id @default(autoincrement())
+  status    status
+  ShopOrder ShopOrder[]
+}
+
+enum status {
+  OrderVerified
+  ReadyToShip
+  Shipped
+  Complete
+}
+
+model ShippingMethod {
+  id        Int         @id @default(autoincrement())
+  name      String
+  price     Int
+  ShopOrder ShopOrder[]
+}
