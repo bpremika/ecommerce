@@ -1,0 +1,31 @@
+.navbar{
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+    align-items: baseline;
+    
+}
+.brandname{
+    font-size: 40px;
+    font-weight: 600;
+}
+
+.shop{
+    font-weight: 300;
+    font-size: 32;
+    cursor: pointer;
+}
+.navItemContainer{
+    display: flex;
+    flex-direction: row;
+    gap :5px;
+    
+}
+.navItem{
+    padding :5px;
+    background-color: beige;
+    font-weight: 300;
+    font-size: 32;
+    cursor: pointer;
+}
