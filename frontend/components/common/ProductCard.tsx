@@ -1,5 +1,13 @@
 import style from  '../../styles/productCard.module.css';
 import Image from 'next/image'
+
+interface Prop{
+    id :number,
+    name : string,
+    product_img: String,
+    price :number
+
+}
 const ProductCard= () => {
     return <div className={style.card}>
                 <div className={style.imgBox}>

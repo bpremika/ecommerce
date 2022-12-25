@@ -24,8 +24,11 @@
 }
 .navItem{
     padding :5px;
-    background-color: beige;
     font-weight: 300;
     font-size: 32;
     cursor: pointer;
+}
+
+.navItem:hover{
+    color:#FD6572;
 }

@@ -20,7 +20,10 @@ export default function Home() {
       <main className={styles.main}>
         <Navbar/>
         <BannerCarousel/>
-        <ProductCard/>
+        <h1>Best Seller</h1>
+        <div className='productItemContainer'>
+          <ProductCard/>
+        </div>
       </main>
     </>
   )

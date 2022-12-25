@@ -65,35 +65,38 @@ model UserPaymentMethod {
 }
 
 model PaymentType {
-  id    Int    @id @default(autoincrement())
-  value String
+  id      Int       @id @default(autoincrement())
+  value   String
+  product Product[]
 }
 
 model Product {
-  id          Int             @id @default(autoincrement())
-  name        String
-  desc        String
-  category    ProductCategory @relation(fields: [category_id], references: [id])
-  category_id Int
-  product_img String
-  price       Int
-  created_at  DateTime
-  modified_at DateTime
-  deleted_at  DateTime
-  ProductItem ProductItem[]
+  id             Int              @id @default(autoincrement())
+  name           String
+  desc           String
+  category       ProductCategory  @relation(fields: [category_id], references: [id])
+  category_id    Int
+  product_img    String
+  price          Int
+  created_at     DateTime         @default(now())
+  modified_at    DateTime         @updatedAt()
+  deleted_at     DateTime         @updatedAt()
+  shippingmethod ShippingMethod[]
+  ProductItem    ProductItem[]
+  paymentType    PaymentType[]
+  Variation      Variation[]
 }
 
 model ProductCategory {
   id                 Int               @id @default(autoincrement())
   parent_category    ProductCategory   @relation("ParentCategory", fields: [parent_category_id], references: [id])
   parent_category_id Int
-  name               String
+  name               String            @unique
   created_at         DateTime
   modified_at        DateTime
   deleted_at         DateTime
   Product            Product[]
   ProductCategory    ProductCategory[] @relation("ParentCategory")
-  Variation          Variation[]
 }
 
 model ProductItem {
@@ -101,31 +104,32 @@ model ProductItem {
   product          Product            @relation(fields: [product_id], references: [id])
   product_id       Int
   quantity         Int
-  SKU              Int
+  SKU              String
   price            Int
   product_img      String
   created_at       DateTime
   modified_at      DateTime
   deleted_at       DateTime
-  variation_option VariationOption[]
+  variation_option VariationOption?
   ShoppingCartItem ShoppingCartItem[]
   OrderLine        OrderLine[]
 }
 
 model Variation {
   id              Int               @id @default(autoincrement())
-  category        ProductCategory   @relation(fields: [category_id], references: [id])
-  category_id     Int
+  product         Product           @relation(fields: [product_id], references: [id])
+  product_id      Int
   name            String
   VariationOption VariationOption[]
 }
 
 model VariationOption {
-  id           Int           @id @default(autoincrement())
-  variation    Variation     @relation(fields: [variation_id], references: [id])
-  variation_id Int
-  value        String
-  product_item ProductItem[]
+  id             Int         @id @default(autoincrement())
+  variation      Variation   @relation(fields: [variation_id], references: [id])
+  variation_id   Int
+  value          String
+  product_item   ProductItem @relation(fields: [productItem_id], references: [id])
+  productItem_id Int         @unique
 }
 
 model ShoppingCart {
@@ -186,5 +190,6 @@ model ShippingMethod {
   id        Int         @id @default(autoincrement())
   name      String
   price     Int
+  product   Product[]
   ShopOrder ShopOrder[]
 }
