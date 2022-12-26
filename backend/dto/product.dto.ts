@@ -1,33 +1,44 @@
 export interface ProductCardDTO {
-  id: number;
-  name: string;
-  product_img: String;
-  price: number;
+    id: number;
+    name: string;
+    product_img: String;
+    price: number;
 }
 
 export interface ProductCardsDTO {
     total: number;
-    productCards :ProductCardDTO[];
-  }
+    productCards: ProductCardDTO[];
+}
 
 export interface ProductPageDTO {
     id: number;
     name: string;
     product_img: String;
     price: number;
-    desc:String;
-    variation : variantDTO[];
-  }
-
-export interface variantDTO{
-    name : string;
-    option : variantOptionDTO[];
+    desc: String;
+    variation: variantDTO[];
 }
 
-export interface variantOptionDTO{
-    value : string;
-    quantity : number;
-    SKU : string;
-    price : number;
-    product_img : string;
+export interface variantDTO {
+    name: string;
+    option: variantOptionDTO[];
 }
+
+export interface variantOptionDTO {
+    value: string;
+    quantity: number;
+    SKU: string;
+    price: number;
+    product_img: string;
+}
+
+export interface AddNewProductDTO {
+    name: string;
+    desc: string;
+    category_id: number;
+    product_img: string;
+    price: number;
+    // productItem :
+}
+
+export interface AddProductItem {}

@@ -9,13 +9,120 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getManyProductCards = exports.getOneProductCard = void 0;
+exports.getManyProductCards = exports.getProductPage = exports.addNewProduct = exports.getShoppingBag = void 0;
 const prisma_1 = require("../common/prisma");
-const getOneProductCard = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getShoppingBag = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
-exports.getOneProductCard = getOneProductCard;
+exports.getShoppingBag = getShoppingBag;
+const addNewProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const product = req.body;
+});
+exports.addNewProduct = addNewProduct;
+const getProductPage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = parseInt(req.params.id);
+    const product = yield prisma_1.prisma.product.findUnique({
+        where: {
+            id: id,
+        },
+        include: {
+            Variation: {
+                include: {
+                    VariationOption: {
+                        include: {
+                            product_item: true,
+                        },
+                    },
+                },
+            },
+        },
+    });
+    if (product == null) {
+        res.status(404).json({ message: "Not found" });
+    }
+    else {
+        const productPageDTO = {
+            id: product.id,
+            name: product.name,
+            product_img: product.product_img,
+            price: product.price,
+            desc: product.desc,
+            variation: product.Variation.map((e) => {
+                return {
+                    name: e.name,
+                    option: e.VariationOption.map((e) => {
+                        return {
+                            value: e.value,
+                            quantity: e.product_item.quantity,
+                            SKU: e.product_item.SKU,
+                            price: e.product_item.price,
+                            product_img: e.product_item.product_img,
+                        };
+                    }),
+                };
+            }),
+        };
+        res.status(200).json(productPageDTO);
+    }
+});
+exports.getProductPage = getProductPage;
 const getManyProductCards = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const productCards = yield prisma_1.prisma.Product.
-    ;
+    const category = req.query.category;
+    if (category == null) {
+        const productCards = yield prisma_1.prisma.product.findMany({
+            select: {
+                id: true,
+                name: true,
+                product_img: true,
+                price: true,
+            },
+        });
+        if (productCards == null) {
+            res.status(404).json({
+                message: "No item found",
+            });
+        }
+        else {
+            const productCardsDTO = {
+                total: productCards.length,
+                productCards,
+            };
+            res.status(200).json(productCardsDTO);
+        }
+        return;
+    }
+    const isProductCategory = yield prisma_1.prisma.productCategory.findUnique({
+        select: {
+            name: true,
+        },
+        where: {
+            name: category,
+        },
+    });
+    if (isProductCategory == null) {
+        res.status(404).json({
+            message: "Not found",
+        });
+        return;
+    }
+    else {
+        const productCards = yield prisma_1.prisma.product.findMany({
+            select: {
+                id: true,
+                name: true,
+                product_img: true,
+                price: true,
+            },
+            where: {
+                category: {
+                    name: category,
+                },
+            },
+        });
+        const productCardsDTO = {
+            total: productCards.length,
+            productCards,
+        };
+        res.status(200).json(productCardsDTO);
+    }
 });
 exports.getManyProductCards = getManyProductCards;

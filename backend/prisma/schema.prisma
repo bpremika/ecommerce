@@ -17,12 +17,19 @@ model User {
   password          String
   first_name        String
   last_name         String
-  phone_number      Int
+  phone_number      String
   created_at        DateTime            @default(now())
   modified_at       DateTime            @default(now())
   address           Address[]
   UserPaymentMethod UserPaymentMethod[]
   ShoppingCart      ShoppingCart[]
+}
+
+model Session {
+  id        String   @id
+  sid       String   @unique
+  data      String
+  expiresAt   DateTime
 }
 
 enum Role {
@@ -89,8 +96,8 @@ model Product {
 
 model ProductCategory {
   id                 Int               @id @default(autoincrement())
-  parent_category    ProductCategory   @relation("ParentCategory", fields: [parent_category_id], references: [id])
-  parent_category_id Int
+  parent_category    ProductCategory?  @relation("ParentCategory", fields: [parent_category_id], references: [id])
+  parent_category_id Int?
   name               String            @unique
   created_at         DateTime
   modified_at        DateTime
